@@ -118,6 +118,8 @@ The frontend communicates with the FastAPI backend through the `/transcribe` end
 
 ### Available Scripts
 
+- `npm install`: Install 
+- `npm install --save-dev http-proxy-middleware` 
 - `npm start`: Start development server
 - `npm run build`: Create production build
 - `npm test`: Run tests
