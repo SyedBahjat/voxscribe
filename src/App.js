@@ -10,9 +10,10 @@ function App() {
   const [transcriptionResult, setTranscriptionResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [uploadedFile, setUploadedFile] = useState(null);
   const [settings, setSettings] = useState({
-    language: 'auto',
-    task: 'transcribe'
+    from_language: 'auto',
+    to_language: 'same'
   });
 
   const handleTranscriptionComplete = (result) => {
@@ -33,13 +34,31 @@ function App() {
     }
   };
 
+  const handleFileUpload = (file) => {
+    setUploadedFile(file);
+  };
+
   const downloadTranscription = () => {
     if (transcriptionResult) {
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
       const blob = new Blob([transcriptionResult.text], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `transcription_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
+      a.download = `transcription_${timestamp}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  };
+
+  const downloadOriginalFile = () => {
+    if (uploadedFile) {
+      const url = URL.createObjectURL(uploadedFile);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = uploadedFile.name;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -53,21 +72,22 @@ function App() {
         <header className="app-header">
           <h1>
             <Mic className="header-icon" />
-            Audio Transcribe
+            Audio & Video Transcribe
           </h1>
-          <p>AI-powered audio transcription and translation</p>
+          <p>AI-powered audio and video transcription and translation</p>
         </header>
 
         <div className="grid">
           <div className="card">
             <h2>
               <Upload className="section-icon" />
-              Upload Audio File
+              Upload Audio/Video File
             </h2>
             <FileUpload
               onTranscriptionComplete={handleTranscriptionComplete}
               onError={handleError}
               onLoading={handleLoading}
+              onFileUpload={handleFileUpload}
               settings={settings}
             />
           </div>
@@ -101,7 +121,7 @@ function App() {
           <div className="card">
             <div className="loading-container">
               <div className="loading-spinner"></div>
-              <p>Processing your audio... This may take a few moments.</p>
+              <p>Processing your audio/video... This may take a few moments.</p>
             </div>
           </div>
         )}
@@ -121,13 +141,24 @@ function App() {
                 <FileAudio className="section-icon" />
                 Transcription Result
               </h2>
-              <button 
-                className="btn btn-success"
-                onClick={downloadTranscription}
-              >
-                <Download size={20} />
-                Download
-              </button>
+              <div className="download-buttons">
+                <button
+                  className="btn btn-success"
+                  onClick={downloadTranscription}
+                  disabled={!transcriptionResult}
+                >
+                  <Download size={20} />
+                  Download TXT
+                </button>
+                <button
+                  className="btn btn-primary"
+                  onClick={downloadOriginalFile}
+                  disabled={!uploadedFile}
+                >
+                  <Download size={20} />
+                  Download Original
+                </button>
+              </div>
             </div>
             <TranscriptionResult result={transcriptionResult} />
           </div>
@@ -135,10 +166,10 @@ function App() {
 
         <footer className="app-footer">
           <p>
-            💡 <strong>Tip:</strong> Supports 90+ languages with automatic detection and translation to English.
+            💡 <strong>Tip:</strong> Supports 90+ languages with automatic detection and translation capabilities.
           </p>
           <p>
-            Processing time varies: Short clips (~10-30s), Medium videos (~1-3min), Long videos (~5-15min)
+            Processing time varies: Short clips (~10-30s), Medium files (~1-3min), Long files (~5-15min)
           </p>
         </footer>
       </div>

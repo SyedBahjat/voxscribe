@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+const API_BASE_URL = process.env.REACT_APP_API_URL || '';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -59,8 +59,8 @@ export const transcribeAudio = async (file, settings = {}) => {
   try {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('language', settings.language || 'auto');
-    formData.append('task', settings.task || 'transcribe');
+    formData.append('from_language', settings.from_language || 'auto');
+    formData.append('to_language', settings.to_language || 'same');
 
     console.log('Uploading file:', file.name, 'Size:', file.size, 'bytes');
     console.log('Settings:', settings);
@@ -77,9 +77,11 @@ export const transcribeAudio = async (file, settings = {}) => {
 
     const result = {
       text: response.data.text,
-      language: response.data.language || 'unknown',
+      original_text: response.data.original_text || null,
+      source_language: response.data.source_language || 'unknown',
+      target_language: response.data.target_language || 'unknown',
+      mode: response.data.mode || 'transcribe',
       timestamp: new Date().toISOString(),
-      segments: response.data.segments || null,
     };
 
     console.log('Transcription completed:', result);
@@ -96,7 +98,7 @@ export const checkServerHealth = async () => {
     const response = await api.get('/health');
     return response.data;
   } catch (error) {
-    throw new Error('Backend server is not responding. Please make sure the server is running on port 8080.');
+    throw new Error('Backend server is not responding. Please make sure the server is running on port 8000.');
   }
 };
 
