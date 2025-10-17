@@ -17,25 +17,71 @@
   color: white;
 }
 
-.app-header h1 {
-  font-size: 3rem;
-  font-weight: 700;
-  margin-bottom: 10px;
+.animated-title {
   display: flex;
+  flex-direction: column;
   align-items: center;
+  gap: 20px;
+}
+
+.title-main {
+  display: flex;
+  flex-wrap: wrap;
   justify-content: center;
+  align-items: center;
   gap: 15px;
+  margin: 0;
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1.2;
 }
 
-.header-icon {
-  width: 60px;
-  height: 60px;
+.title-word {
+  display: inline-block;
+  background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 50%, #e0e0e0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: wordFloat 3s ease-in-out infinite;
+  animation-fill-mode: both;
+  filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.3));
 }
 
-.app-header p {
-  font-size: 1.2rem;
-  opacity: 0.9;
-  font-weight: 300;
+.title-word:nth-child(1) { animation-delay: 0s; }
+.title-word:nth-child(2) { animation-delay: 0.2s; }
+.title-word:nth-child(3) { animation-delay: 0.4s; }
+.title-word:nth-child(4) { animation-delay: 0.6s; }
+.title-word:nth-child(5) { animation-delay: 0.8s; }
+
+@keyframes wordFloat {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+    filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.3));
+  }
+  50% {
+    transform: translateY(-10px) scale(1.05);
+    filter: drop-shadow(0 8px 20px rgba(255, 255, 255, 0.5));
+  }
+}
+
+.title-subtitle {
+  margin-top: 10px;
+}
+
+.subtitle-text {
+  font-size: 1.3rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  animation: subtitleGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes subtitleGlow {
+  0% {
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+  }
+  100% {
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.6));
+  }
 }
 
 .section-icon {
@@ -423,6 +469,15 @@
 }
 
 @media (max-width: 768px) {
+  .title-main {
+    font-size: 2.5rem;
+    gap: 10px;
+  }
+
+  .subtitle-text {
+    font-size: 1.1rem;
+  }
+
   .input-methods {
     grid-template-columns: 1fr;
     gap: 12px;

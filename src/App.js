@@ -71,11 +71,18 @@ function App() {
     <div className="App">
       <div className="container">
         <header className="app-header">
-          <h1>
-            <Mic className="header-icon" />
-            Audio & Video Transcribe
-          </h1>
-          <p>AI-powered audio and video transcription and translation</p>
+          <div className="animated-title">
+            <h1 className="title-main">
+              <span className="title-word">Your</span>
+              <span className="title-word">AI</span>
+              <span className="title-word">Powered</span>
+              <span className="title-word">Transcriber</span>
+              <span className="title-word">Tool</span>
+            </h1>
+            <div className="title-subtitle">
+              <span className="subtitle-text">Transform audio & video into text with AI magic</span>
+            </div>
+          </div>
         </header>
 
         <div className="main-content">
@@ -167,9 +174,6 @@ function App() {
         )}
 
         <footer className="app-footer">
-          <p>
-            💡 <strong>Tip:</strong> Supports 90+ languages with automatic detection and translation capabilities.
-          </p>
           <p>
             Processing time varies: Short clips (~10-30s), Medium files (~1-3min), Long files (~5-15min)
           </p>

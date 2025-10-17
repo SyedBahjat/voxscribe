@@ -49,12 +49,6 @@ const TranscriptionResult = ({ result }) => {
             <span>Target: <strong>{result.target_language.toUpperCase()}</strong></span>
           </div>
         )}
-        {result.mode && (
-          <div className="metadata-item">
-            <Languages size={16} />
-            <span>Mode: <strong>{getModeDescription(result.mode)}</strong></span>
-          </div>
-        )}
         {result.timestamp && (
           <div className="metadata-item">
             <Clock size={16} />
