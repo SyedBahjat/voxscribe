@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Copy, Check, Globe, Clock } from 'lucide-react';
+import { Copy, Check, Globe, Clock, Languages, ArrowRight } from 'lucide-react';
 import './FileUpload.css';
 
 const TranscriptionResult = ({ result }) => {
@@ -21,13 +21,38 @@ const TranscriptionResult = ({ result }) => {
     return date.toLocaleString();
   };
 
+  const getModeDescription = (mode) => {
+    switch (mode) {
+      case 'transcribe':
+        return 'Transcription only';
+      case 'whisper-translate':
+        return 'Whisper native translation';
+      case 'asr+text-translate':
+        return 'ASR + Text translation';
+      default:
+        return 'Unknown mode';
+    }
+  };
+
   return (
     <div className="transcription-result">
       <div className="result-metadata">
-        {result.language && (
+        {result.source_language && (
           <div className="metadata-item">
             <Globe size={16} />
-            <span>Language: <strong>{result.language.toUpperCase()}</strong></span>
+            <span>Source: <strong>{result.source_language.toUpperCase()}</strong></span>
+          </div>
+        )}
+        {result.target_language && result.target_language !== result.source_language && (
+          <div className="metadata-item">
+            <ArrowRight size={16} />
+            <span>Target: <strong>{result.target_language.toUpperCase()}</strong></span>
+          </div>
+        )}
+        {result.mode && (
+          <div className="metadata-item">
+            <Languages size={16} />
+            <span>Mode: <strong>{getModeDescription(result.mode)}</strong></span>
           </div>
         )}
         {result.timestamp && (
@@ -40,7 +65,7 @@ const TranscriptionResult = ({ result }) => {
 
       <div className="result-content">
         <div className="result-header">
-          <h3>Transcription</h3>
+          <h3>{result.original_text ? 'Translation' : 'Transcription'}</h3>
           <button 
             className={`btn ${copied ? 'btn-success' : ''}`}
             onClick={copyToClipboard}
@@ -54,6 +79,15 @@ const TranscriptionResult = ({ result }) => {
         <div className="result-text">
           {result.text}
         </div>
+
+        {result.original_text && result.original_text !== result.text && (
+          <div className="original-text-container">
+            <h4>Original Text</h4>
+            <div className="original-text">
+              {result.original_text}
+            </div>
+          </div>
+        )}
       </div>
 
       {result.segments && result.segments.length > 0 && (
