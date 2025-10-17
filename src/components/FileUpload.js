@@ -1,12 +1,13 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, FileAudio, FileVideo, AlertCircle } from 'lucide-react';
+import { Upload, FileAudio, FileVideo, AlertCircle, X } from 'lucide-react';
 import { transcribeAudio } from '../utils/api';
 import './FileUpload.css';
 
 const FileUpload = ({ onTranscriptionComplete, onError, onLoading, onFileUpload, settings }) => {
   const [uploadedFile, setUploadedFile] = useState(null);
   const [fileError, setFileError] = useState(null);
+  const fileInputRef = useRef(null);
 
   const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
     setFileError(null);
@@ -28,7 +29,7 @@ const FileUpload = ({ onTranscriptionComplete, onError, onLoading, onFileUpload,
     if (onFileUpload) {
       onFileUpload(file);
     }
-  }, []);
+  }, [onFileUpload]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -52,13 +53,6 @@ const FileUpload = ({ onTranscriptionComplete, onError, onLoading, onFileUpload,
     }
   };
 
-  const formatFileSize = (bytes) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
 
   const isVideoFile = (file) => {
     return file && file.type.startsWith('video/');
@@ -70,42 +64,28 @@ const FileUpload = ({ onTranscriptionComplete, onError, onLoading, onFileUpload,
 
   return (
     <div className="file-upload-container">
-      <div
-        {...getRootProps()}
-        className={`dropzone ${isDragActive ? 'active' : ''}`}
-      >
-        <input {...getInputProps()} />
-        <Upload size={48} className="upload-icon" />
-        <h3>
-          {isDragActive ? 'Drop the file here' : 'Drag & drop audio or video file here'}
-        </h3>
-        <p>or click to select a file</p>
-        <p className="file-types">
-          Supported: MP3, WAV, M4A, OGG, FLAC, MP4, AVI, MOV, MKV (max 500MB)
-        </p>
-      </div>
-
-      {fileError && (
-        <div className="error-message">
-          <AlertCircle size={20} />
-          {fileError}
+      {!uploadedFile ? (
+        <div
+          {...getRootProps()}
+          className={`dropzone ${isDragActive ? 'active' : ''}`}
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <input {...getInputProps()} ref={fileInputRef} />
+          <Upload size={48} className="upload-icon" />
+          <h3>
+            {isDragActive ? 'Drop the file here' : 'Drag & drop audio or video file here'}
+          </h3>
+          <p>or click to select a file</p>
+          <p className="file-types">
+            Supported: MP3, WAV, M4A, OGG, FLAC, MP4, AVI, MOV, MKV (max 500MB)
+          </p>
         </div>
-      )}
-
-      {uploadedFile && (
-        <div className="uploaded-file">
-          <div className="file-info">
-            {React.createElement(getFileIcon(uploadedFile), { size: 24 })}
-            <div>
-              <strong>{uploadedFile.name}</strong>
-              <p>{formatFileSize(uploadedFile.size)}</p>
-            </div>
-          </div>
-
+      ) : (
+        <div className="uploaded-file-display">
           {isVideoFile(uploadedFile) ? (
             <video
               controls
-              className="media-player"
+              className="media-player-full"
               src={URL.createObjectURL(uploadedFile)}
               preload="metadata"
             >
@@ -114,20 +94,52 @@ const FileUpload = ({ onTranscriptionComplete, onError, onLoading, onFileUpload,
           ) : (
             <audio
               controls
-              className="media-player"
+              className="media-player-full"
               src={URL.createObjectURL(uploadedFile)}
             >
               Your browser does not support the audio element.
             </audio>
           )}
 
-          <button
-            className="btn"
-            onClick={handleTranscribe}
-          >
-            {React.createElement(getFileIcon(uploadedFile), { size: 20 })}
-            {isVideoFile(uploadedFile) ? 'Transcribe Video' : 'Transcribe Audio'}
-          </button>
+          <div className="file-actions">
+            <button
+              className="btn"
+              onClick={handleTranscribe}
+            >
+              {React.createElement(getFileIcon(uploadedFile), { size: 20 })}
+              {isVideoFile(uploadedFile) ? 'Transcribe Video' : 'Transcribe Audio'}
+            </button>
+            <div className="file-management">
+              <button
+                className="btn btn-sm btn-outline"
+                onClick={() => fileInputRef.current?.click()}
+                title="Replace file"
+              >
+                <Upload size={14} />
+                Replace
+              </button>
+              <button
+                className="btn btn-sm btn-outline"
+                onClick={() => {
+                  setUploadedFile(null);
+                  setFileError(null);
+                  if (fileInputRef.current) {
+                    fileInputRef.current.value = '';
+                  }
+                }}
+              >
+                <X size={14} />
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {fileError && (
+        <div className="error-message">
+          <AlertCircle size={20} />
+          {fileError}
         </div>
       )}
     </div>

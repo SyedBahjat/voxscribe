@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mic, Upload, FileAudio, Settings, Download } from 'lucide-react';
+import { Mic, FileAudio, Download } from 'lucide-react';
 import FileUpload from './components/FileUpload';
 import AudioRecorder from './components/AudioRecorder';
 import TranscriptionResult from './components/TranscriptionResult';
@@ -13,7 +13,7 @@ function App() {
   const [uploadedFile, setUploadedFile] = useState(null);
   const [settings, setSettings] = useState({
     from_language: 'auto',
-    to_language: 'same'
+    to_language: 'en'
   });
 
   const handleTranscriptionComplete = (result) => {
@@ -21,6 +21,7 @@ function App() {
     setIsLoading(false);
     setError(null);
   };
+
 
   const handleError = (errorMessage) => {
     setError(errorMessage);
@@ -77,51 +78,54 @@ function App() {
           <p>AI-powered audio and video transcription and translation</p>
         </header>
 
-        <div className="grid">
-          <div className="card">
-            <h2>
-              <Upload className="section-icon" />
-              Upload Audio/Video File
-            </h2>
-            <FileUpload
-              onTranscriptionComplete={handleTranscriptionComplete}
-              onError={handleError}
-              onLoading={handleLoading}
-              onFileUpload={handleFileUpload}
-              settings={settings}
-            />
-          </div>
+        <div className="main-content">
+          <div className="transcription-interface">
+            <div className="interface-header">
+              <h2>🎵 Audio & Video Transcription</h2>
+              <p>Upload files or record audio for AI-powered transcription</p>
+            </div>
 
-          <div className="card">
-            <h2>
-              <Mic className="section-icon" />
-              Record Audio
-            </h2>
-            <AudioRecorder
-              onTranscriptionComplete={handleTranscriptionComplete}
-              onError={handleError}
-              onLoading={handleLoading}
-              settings={settings}
-            />
-          </div>
+            <div className="language-settings-top">
+              <SettingsPanel
+                settings={settings}
+                onSettingsChange={setSettings}
+              />
+            </div>
 
-          <div className="card">
-            <h2>
-              <Settings className="section-icon" />
-              Settings
-            </h2>
-            <SettingsPanel
-              settings={settings}
-              onSettingsChange={setSettings}
-            />
+            <div className="input-methods">
+              <div className="upload-area">
+                <FileUpload
+                  onTranscriptionComplete={handleTranscriptionComplete}
+                  onError={handleError}
+                  onLoading={handleLoading}
+                  onFileUpload={handleFileUpload}
+                  settings={settings}
+                />
+              </div>
+
+              <div className="recording-area">
+                <AudioRecorder
+                  onTranscriptionComplete={handleTranscriptionComplete}
+                  onError={handleError}
+                  onLoading={handleLoading}
+                  settings={settings}
+                />
+              </div>
+            </div>
           </div>
         </div>
 
         {isLoading && (
-          <div className="card">
-            <div className="loading-container">
+          <div className="full-page-loading">
+            <div className="loading-content">
               <div className="loading-spinner"></div>
-              <p>Processing your audio/video... This may take a few moments.</p>
+              <h2>Transcribing your audio/video...</h2>
+              <p>Almost there! Please wait while we process your file.</p>
+              <div className="loading-progress">
+                <div className="progress-bar">
+                  <div className="progress-fill"></div>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -135,17 +139,16 @@ function App() {
         )}
 
         {transcriptionResult && (
-          <div className="card">
-            <div className="result-header">
+          <div className="results-section">
+            <div className="results-header-inline">
               <h2>
                 <FileAudio className="section-icon" />
-                Transcription Result
+                Transcription Complete!
               </h2>
               <div className="download-buttons">
                 <button
                   className="btn btn-success"
                   onClick={downloadTranscription}
-                  disabled={!transcriptionResult}
                 >
                   <Download size={20} />
                   Download TXT
@@ -153,7 +156,6 @@ function App() {
                 <button
                   className="btn btn-primary"
                   onClick={downloadOriginalFile}
-                  disabled={!uploadedFile}
                 >
                   <Download size={20} />
                   Download Original

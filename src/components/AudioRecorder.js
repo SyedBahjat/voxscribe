@@ -137,74 +137,69 @@ const AudioRecorder = ({ onTranscriptionComplete, onError, onLoading, settings }
 
   return (
     <div className="audio-recorder-container">
-      {!isRecording && !audioBlob && (
-        <div className="recording-setup">
-          <div className="mic-icon">
-            <Mic size={64} />
-          </div>
-          <h3>Ready to Record</h3>
-          <p>Click the button below to start recording your audio</p>
-          <button 
-            className="btn btn-danger"
-            onClick={startRecording}
-            disabled={hasPermission === null}
-          >
-            <Mic size={20} />
-            Start Recording
-          </button>
-        </div>
-      )}
+      {!audioBlob ? (
+        <>
+          {!isRecording ? (
+            <div className="recording-setup">
+              <div className="mic-icon">
+                <Mic size={40} />
+              </div>
+              <h3>Ready to Record</h3>
+              <p>Click to start recording</p>
+              <button
+                className="btn btn-danger"
+                onClick={startRecording}
+                disabled={hasPermission === null}
+              >
+                <Mic size={16} />
+                Start Recording
+              </button>
+            </div>
+          ) : (
+            <div className="recording-active">
+              <div className="recording-indicator">
+                <div className="recording-dot"></div>
+                <span>{formatTime(recordingTime)}</span>
+              </div>
 
-      {isRecording && (
-        <div className="recording-active">
-          <div className="recording-indicator">
-            <div className="recording-dot"></div>
-            <span>Recording {formatTime(recordingTime)}</span>
-          </div>
-          
-          <div className="recording-controls">
-            <button 
-              className="btn"
-              onClick={pauseRecording}
-            >
-              {isPaused ? <Play size={20} /> : <Pause size={20} />}
-              {isPaused ? 'Resume' : 'Pause'}
-            </button>
-            <button 
-              className="btn btn-danger"
-              onClick={stopRecording}
-            >
-              <Square size={20} />
-              Stop Recording
-            </button>
-          </div>
-        </div>
-      )}
-
-      {audioBlob && (
+              <div className="recording-controls">
+                <button
+                  className="btn btn-sm"
+                  onClick={pauseRecording}
+                >
+                  {isPaused ? <Play size={14} /> : <Pause size={14} />}
+                  {isPaused ? 'Resume' : 'Pause'}
+                </button>
+                <button
+                  className="btn btn-sm btn-danger"
+                  onClick={stopRecording}
+                >
+                  <Square size={14} />
+                  Stop
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      ) : (
         <div className="recording-complete">
-          <div className="recording-info">
-            <h3>Recording Complete</h3>
-            <p>Duration: {formatTime(recordingTime)}</p>
-          </div>
-          
-          <audio 
-            controls 
+          <audio
+            controls
             className="audio-player"
             src={audioUrl}
           >
             Your browser does not support the audio element.
           </audio>
-          
+
           <div className="recording-actions">
-            <button 
+            <button
               className="btn"
               onClick={handleTranscribe}
             >
               <Mic size={20} />
               Transcribe Recording
             </button>
-            <button 
+            <button
               className="btn"
               onClick={clearRecording}
             >
