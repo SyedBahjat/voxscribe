@@ -81,24 +81,24 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-hero">
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-md">
-        <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-gradient-primary shadow-glow">
-                  <Mic className="w-6 h-6 text-primary-foreground" />
+        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
+            <div className="flex items-center justify-between gap-2 sm:gap-4">
+              <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                <div className="p-1.5 sm:p-2 rounded-lg bg-gradient-primary shadow-glow flex-shrink-0">
+                  <Mic className="w-4 h-4 sm:w-6 sm:h-6 text-primary-foreground" />
                 </div>
-                <div>
-                  <h1 className="text-xl md:text-2xl font-bold text-foreground">AI Transcription Studio</h1>
-                  <p className="text-xs text-muted-foreground">Professional Transcription Service</p>
+                <div className="min-w-0 flex-1">
+                  <h1 className="text-base sm:text-xl md:text-2xl font-bold text-foreground truncate">AI Transcription Studio</h1>
+                  <p className="text-xs text-muted-foreground hidden sm:block">Professional Transcription Service</p>
                 </div>
               </div>
               <Button
                 variant="outline"
                 onClick={() => setIsProjectsViewOpen(true)}
-                className="border-2 bg-background hover:bg-background hover:border-primary/70 hover:text-primary transition-all duration-200"
+                className="border-2 bg-background hover:bg-background hover:border-primary/70 hover:text-primary transition-all duration-200 flex-shrink-0 text-xs sm:text-sm"
               >
-                <FolderOpen className="w-4 h-4 mr-2" />
-                View Projects
+                <FolderOpen className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
+                <span className="hidden sm:inline">View Projects</span>
               </Button>
             </div>
         </div>
@@ -110,22 +110,22 @@ const Index = () => {
           <div className="space-y-16">
             {/* Hero Section */}
             <div className="max-w-4xl mx-auto text-center animate-fade-in">
-              <div className="inline-block px-4 py-2 mb-6 bg-primary/10 border border-primary/20 rounded-full">
-                <span className="text-sm font-medium text-primary">AI-Powered Transcription</span>
+              <div className="inline-block px-3 sm:px-4 py-2 mb-4 sm:mb-6 bg-primary/10 border border-primary/20 rounded-full">
+                <span className="text-xs sm:text-sm font-medium text-primary">AI-Powered Transcription</span>
               </div>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-foreground mb-4 sm:mb-6 leading-tight px-2">
                 Transform Audio & Video
                 <br />
                 <span className="bg-gradient-primary bg-clip-text text-transparent">into Accurate Text</span>
               </h2>
-              <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+              <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto mb-6 sm:mb-8 px-2">
                 Upload your audio or video files and get professional-grade transcriptions in 18+ languages.
                 Fast, accurate, and secure.
               </p>
             </div>
 
             {/* Features Grid */}
-            <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-slide-up">
+            <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 animate-slide-up">
               <FeatureCard
                 icon={Globe}
                 title="18+ Languages"
@@ -150,7 +150,7 @@ const Index = () => {
 
             {/* Upload Section */}
             <div className="max-w-5xl mx-auto">
-              <Card className="p-6 md:p-10 shadow-elegant bg-card border-2">
+              <Card className="p-4 sm:p-6 md:p-10 shadow-elegant bg-card border-2">
                 <div className="space-y-8">
                   {/* File Upload */}
                   <div>

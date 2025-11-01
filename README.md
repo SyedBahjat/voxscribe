@@ -118,12 +118,9 @@ The frontend communicates with the FastAPI backend through the `/transcribe` end
 
 ### Available Scripts
 
-- `npm install`: Install 
-- `npm install --save-dev http-proxy-middleware` 
-- `npm start`: Start development server
-- `npm run build`: Create production build
-- `npm test`: Run tests
-- `npm run eject`: Eject from Create React App (not recommended)
+- `npm i`: Install the necessary dependencies.
+- `npm run dev`: Start the development server with auto-reloading and an instant preview.
+- `npm build`: Build the project.
 
 ### Environment Variables
 

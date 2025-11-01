@@ -115,33 +115,33 @@ export const ProjectsView = ({ open, onOpenChange }: ProjectsViewProps) => {
   if (selectedProject) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[700px] max-h-[80vh] flex flex-col">
-          <DialogHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setSelectedProject(null)}
-                  className="mr-2"
-                >
-                  ← Back
-                </Button>
-                <FolderOpen className="w-5 h-5 text-primary" />
-                <DialogTitle>{selectedProject.name}</DialogTitle>
-              </div>
+        <DialogContent className="w-[95vw] sm:w-full sm:max-w-[700px] max-h-[85vh] sm:max-h-[80vh] flex flex-col mx-auto">
+          <DialogHeader className="pr-10 sm:pr-12">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedProject(null)}
+                className="mr-2"
+              >
+                ← Back
+              </Button>
+              <FolderOpen className="w-5 h-5 text-primary flex-shrink-0" />
+              <DialogTitle className="flex-1 min-w-0 truncate">{selectedProject.name}</DialogTitle>
+            </div>
+            <div className="flex items-center justify-between pt-2">
+              <DialogDescription>
+                {selectedProject.transcriptions?.length || 0} transcription{(selectedProject.transcriptions?.length || 0) !== 1 ? "s" : ""} in this project
+              </DialogDescription>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => handleDeleteProject(selectedProject.id)}
-                className="text-destructive hover:text-destructive"
+                className="text-destructive hover:text-destructive flex-shrink-0"
               >
                 <Trash2 className="w-4 h-4" />
               </Button>
             </div>
-            <DialogDescription>
-              {selectedProject.transcriptions?.length || 0} transcription{(selectedProject.transcriptions?.length || 0) !== 1 ? "s" : ""} in this project
-            </DialogDescription>
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto space-y-4 py-4">
@@ -203,28 +203,29 @@ export const ProjectsView = ({ open, onOpenChange }: ProjectsViewProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] flex flex-col">
-        <DialogHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <FolderOpen className="w-5 h-5 text-primary" />
-              <DialogTitle>My Projects</DialogTitle>
-            </div>
-            {!isCreating && (
-              <Button
-                variant="default"
-                size="sm"
-                onClick={() => setIsCreating(true)}
-                className="border-2 bg-background hover:bg-background hover:border-primary/70 hover:text-primary transition-all duration-200"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Create New Project
-              </Button>
-            )}
+      <DialogContent className="w-[95vw] sm:w-full sm:max-w-[600px] max-h-[85vh] sm:max-h-[80vh] flex flex-col mx-auto">
+        <DialogHeader className="space-y-3 pr-10 sm:pr-12">
+          <div className="flex items-center gap-2">
+            <FolderOpen className="w-5 h-5 text-primary flex-shrink-0" />
+            <DialogTitle className="flex-1">My Projects</DialogTitle>
           </div>
           <DialogDescription>
             View and manage your transcription projects
           </DialogDescription>
+          {!isCreating && (
+            <div className="pt-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsCreating(true)}
+                className="border-2 bg-background hover:bg-background hover:border-primary/70 hover:text-primary transition-all duration-200 w-full sm:w-auto"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Create New Project</span>
+                <span className="sm:hidden">Create New Project</span>
+              </Button>
+            </div>
+          )}
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto space-y-3 py-4">
