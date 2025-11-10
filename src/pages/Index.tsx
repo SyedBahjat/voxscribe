@@ -17,18 +17,27 @@ const Index = () => {
   const [toLanguage, setToLanguage] = useState("en");
   const [isProcessing, setIsProcessing] = useState(false);
   const [transcription, setTranscription] = useState<string | null>(null);
+  const [segments, setSegments] = useState<Array<{
+    text: string;
+    start: number;
+    end: number;
+    start_time: string;
+    end_time: string;
+  }> | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [isProjectsViewOpen, setIsProjectsViewOpen] = useState(false);
 
   const handleFileSelect = (file: File) => {
     setSelectedFile(file);
     setTranscription(null);
+    setSegments(null);
     setVideoUrl(null);
   };
 
   const handleClearFile = () => {
     setSelectedFile(null);
     setTranscription(null);
+    setSegments(null);
     setVideoUrl(null);
   };
 
@@ -46,6 +55,13 @@ const Index = () => {
 
     try {
       const API_URL = import.meta.env.VITE_API_URL || "";
+      
+      if (!API_URL) {
+        toast.error("API URL not configured. Please set VITE_API_URL in your .env file.");
+        setIsProcessing(false);
+        return;
+      }
+
       const response = await fetch(`${API_URL}/transcribe`, {
         method: "POST",
         body: formData,
@@ -53,7 +69,8 @@ const Index = () => {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ detail: "Transcription failed" }));
-        throw new Error(errorData.detail || errorData.message || "Transcription failed");
+        const errorMsg = errorData.detail || errorData.message || `Transcription failed (${response.status})`;
+        throw new Error(errorMsg);
       }
 
       const data = await response.json();
@@ -61,13 +78,29 @@ const Index = () => {
       const transcriptionText = data.text || data.transcription || "Transcription completed successfully!";
       setTranscription(transcriptionText);
       
+      // Capture segments if available
+      if (data.segments && Array.isArray(data.segments) && data.segments.length > 0) {
+        setSegments(data.segments);
+      } else {
+        setSegments(null);
+      }
+      
       if (selectedFile.type.startsWith("video/")) {
         setVideoUrl(URL.createObjectURL(selectedFile));
       }
       
       toast.success("Transcription completed!");
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to transcribe. Please check if the server is running.";
+      let errorMessage = "Failed to transcribe. ";
+      
+      if (error instanceof TypeError && error.message.includes("fetch")) {
+        errorMessage += "Cannot connect to the server. Please check if the backend is running and VITE_API_URL is correct.";
+      } else if (error instanceof Error) {
+        errorMessage += error.message;
+      } else {
+        errorMessage += "Please check if the server is running.";
+      }
+      
       toast.error(errorMessage);
       console.error("Transcription error:", error);
     } finally {
@@ -216,6 +249,7 @@ const Index = () => {
           <div className="max-w-7xl mx-auto">
             <TranscriptionResult
               transcription={transcription}
+              segments={segments}
               isVideo={!!isVideo}
               videoUrl={videoUrl || undefined}
             />
@@ -225,6 +259,7 @@ const Index = () => {
                 onClick={() => {
                   setSelectedFile(null);
                   setTranscription(null);
+                  setSegments(null);
                   setVideoUrl(null);
                 }}
                 variant="outline"
