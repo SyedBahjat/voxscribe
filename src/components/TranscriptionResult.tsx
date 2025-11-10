@@ -1,18 +1,14 @@
 import { Card } from "@/components/ui/card";
-import { CheckCircle2, Copy, Download, FolderPlus, Clock, List, FileText } from "lucide-react";
+import { CheckCircle2, Copy, Download, FolderPlus, Clock, List, FileText, Subtitles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { ProjectDialog } from "./ProjectDialog";
 import { FontSelector, type Font } from "./FontSelector";
+import { segmentsToWebVTT, segmentsToSRT, type TranscriptionSegment } from "@/lib/utils";
 
-export interface TranscriptionSegment {
-  text: string;
-  start: number;
-  end: number;
-  start_time: string;
-  end_time: string;
-}
+// Re-export for backward compatibility
+export type { TranscriptionSegment };
 
 interface TranscriptionResultProps {
   transcription: string;
@@ -33,10 +29,53 @@ export const TranscriptionResult = ({ transcription, segments, isVideo, videoUrl
   const [isProjectDialogOpen, setIsProjectDialogOpen] = useState(false);
   const [selectedFont, setSelectedFont] = useState<Font>(DEFAULT_FONT);
   const [viewMode, setViewMode] = useState<"full" | "segments">("full");
+  const [captionsEnabled, setCaptionsEnabled] = useState(true);
+  const [captionTrackUrl, setCaptionTrackUrl] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const trackRef = useRef<HTMLTrackElement>(null);
   
   const hasSegments = segments && segments.length > 0;
+
+  // Generate WebVTT caption track when segments are available
+  useEffect(() => {
+    if (hasSegments && segments) {
+      const vttContent = segmentsToWebVTT(segments);
+      const blob = new Blob([vttContent], { type: "text/vtt" });
+      const url = URL.createObjectURL(blob);
+      setCaptionTrackUrl(url);
+
+      return () => {
+        URL.revokeObjectURL(url);
+      };
+    }
+  }, [segments, hasSegments]);
+
+  // Toggle captions on/off
+  useEffect(() => {
+    if (trackRef.current && videoRef.current) {
+      const track = trackRef.current;
+      // Wait for track to be ready
+      if (track.track) {
+        if (captionsEnabled) {
+          track.track.mode = "showing";
+        } else {
+          track.track.mode = "hidden";
+        }
+      } else {
+        // If track isn't ready yet, wait for it
+        const handleTrackLoad = () => {
+          if (track.track) {
+            track.track.mode = captionsEnabled ? "showing" : "hidden";
+          }
+        };
+        track.addEventListener("load", handleTrackLoad);
+        return () => {
+          track.removeEventListener("load", handleTrackLoad);
+        };
+      }
+    }
+  }, [captionsEnabled]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(transcription);
@@ -76,6 +115,27 @@ export const TranscriptionResult = ({ transcription, segments, isVideo, videoUrl
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     toast.success("Transcription downloaded!");
+  };
+
+  const handleDownloadCaptions = (format: "vtt" | "srt") => {
+    if (!hasSegments || !segments) {
+      toast.error("No segments available for captions");
+      return;
+    }
+
+    const content = format === "vtt" ? segmentsToWebVTT(segments) : segmentsToSRT(segments);
+    const blob = new Blob([content], { 
+      type: format === "vtt" ? "text/vtt" : "text/plain" 
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `captions.${format}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success(`Captions downloaded as ${format.toUpperCase()}!`);
   };
 
   const renderSegmentsView = () => {
@@ -211,15 +271,67 @@ export const TranscriptionResult = ({ transcription, segments, isVideo, videoUrl
 
           {/* Video - Right (2/5 width) */}
           <Card className="lg:col-span-2 p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6 bg-card shadow-elegant border-2 lg:sticky lg:top-20 lg:self-start order-first lg:order-last">
-            <h3 className="text-lg sm:text-xl font-bold text-foreground">Video Preview</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg sm:text-xl font-bold text-foreground">Video Preview</h3>
+              {hasSegments && (
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={captionsEnabled ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCaptionsEnabled(!captionsEnabled)}
+                    className="h-8 px-3 border-2"
+                    title={captionsEnabled ? "Disable captions" : "Enable captions"}
+                  >
+                    <Subtitles className="w-4 h-4 mr-1" />
+                    <span className="hidden sm:inline">{captionsEnabled ? "Captions On" : "Captions Off"}</span>
+                    <span className="sm:hidden">{captionsEnabled ? "On" : "Off"}</span>
+                  </Button>
+                </div>
+              )}
+            </div>
             <div className="relative rounded-xl overflow-hidden bg-gradient-subtle border-2 border-border aspect-video">
               <video
                 ref={videoRef}
                 src={videoUrl}
                 controls
                 className="w-full h-full object-contain"
-              />
+              >
+                {hasSegments && captionTrackUrl && (
+                  <track
+                    ref={trackRef}
+                    kind="captions"
+                    srcLang="en"
+                    src={captionTrackUrl}
+                    label="English Captions"
+                    default={captionsEnabled}
+                  />
+                )}
+              </video>
             </div>
+            {hasSegments && (
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleDownloadCaptions("vtt")}
+                  className="flex-1 border-2 bg-background hover:bg-background hover:border-primary/70 hover:text-primary transition-all duration-200"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Download VTT</span>
+                  <span className="sm:hidden">VTT</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleDownloadCaptions("srt")}
+                  className="flex-1 border-2 bg-background hover:bg-background hover:border-primary/70 hover:text-primary transition-all duration-200"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Download SRT</span>
+                  <span className="sm:hidden">SRT</span>
+                </Button>
+              </div>
+            )}
           </Card>
         </div>
         
