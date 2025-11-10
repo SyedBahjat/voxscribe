@@ -33,7 +33,7 @@ A modern React-based frontend for the Audio Transcription Application. This fron
 
 3. Create a `.env` file (optional):
    ```bash
-   REACT_APP_API_URL=http://localhost:8080
+   VITE_API_URL=http://localhost:8080
    ```
 
 ## Running the Application
@@ -124,7 +124,7 @@ The frontend communicates with the FastAPI backend through the `/transcribe` end
 
 ### Environment Variables
 
-- `REACT_APP_API_URL`: Backend API URL (default: http://localhost:8080)
+- `VITE_API_URL`: Backend API URL (default: http://localhost:8080)
 
 ## Troubleshooting
 
